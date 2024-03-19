@@ -4,25 +4,55 @@ from database import dbservice
 #! [x] connect to device in RCU
     #! [x] get data without tags in lost or smh
 #! [x] make json object for devices
-#! [x] parse data in for-loop
+#! [ ] parse data for devices:
+    #! [ ] 2 tags parse for:
+        #! [x] rra main params
+        #! [ ] rr bereznik
+        #! [ ] rr kozma
+        #! [ ] rr mezen 
+        #! [ ] rr taiga
+        #! [ ] arh rtrs 1
+        #! [ ] arh rtrs 2
+    #! [ ] 1 tag parse for: 
+        #! [ ] rra add params 
+        #! [ ] rrs sevsk
+        #! [ ] vesti sevsk
+        #! [ ] mayak sevsk 
+        #! [ ] radio retro
+        #! [ ] rr belush guba
+        #! [ ] solnce 
+    #! [ ] recievers:
+        #! [x] 7100 mux1   
+        #! [x] 7100 mux2
+        #! [x] rx 8330 mux1
+        #! [x] rx 8330 mux2
+        #! [x] trk 555
+        #! [x] trk 575
 #! [x] db management
     #! [x] connect to db
     #! [x] read data from DB
     #! [x] write data to DB
     #! [x] change sheet
 
+try:
+    with open('settings.json', 'r+', encoding='UTF-8') as file:
+        settings = json.load(file)
+except:
+    print('Не найден файл настроек')
 
-with open('settings.json', 'r+', encoding='UTF-8') as file:
-    settings = json.load(file)
-
-with open('devices.json', 'r+', encoding='UTF-8') as file:
-    devices = json.load(file)
-
-
-db = dbservice.Database()
-db.dbconn(settings['app_settings']['link_to_db'])
+try:
+    with open('devices.json', 'r+', encoding='UTF-8') as file:
+        devices = json.load(file)
+except:
+    print('Не найден файл со списком устройств')
+try:
+    db = dbservice.Database()
+    db.dbconn(settings['app_settings']['link_to_db'])
+except:
+    print('неуспешное подключение к БД')
 
 rcu_list = devices['RCU']
+rra_device = devices['RCU_RRA']
 
 #? snippets for for-loop
 # url - rcu_list[i]['URL_address'],
@@ -67,11 +97,17 @@ def startApp(row_num):
             
         except Exception as ex:
             print(ex)
-    print(RCU_list_repot)
+
+    for device in rra_device:
+        print('rra')
+    
 
 def save_to_db():
     db.saveDb()
     print('    !INFO DB Saving OK')
+
+def showReport():
+    print(RCU_list_repot)
         
 
 if __name__ == '__main__':

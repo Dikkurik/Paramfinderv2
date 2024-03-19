@@ -1,5 +1,5 @@
 #own modules
-import utility
+import utility, time
 
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
@@ -28,6 +28,7 @@ class ScrapDevice():
             self.driver.find_element(By.NAME, 'username').send_keys(cred[0])
             self.driver.find_element(By.NAME, 'userpass').send_keys(cred[1])
             self.driver.find_element(By.CLASS_NAME, 'auth_submit').click()
+            time.sleep(10)
             self.page = self.driver.page_source
             
         except Exception as ex:
