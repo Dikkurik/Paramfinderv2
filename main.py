@@ -1,56 +1,90 @@
-import requests
-from bs4 import BeautifulSoup
+import ui, scrapper as sc, json
+from database import dbservice 
+
+#! [x] connect to device in RCU
+    #! [x] get data without tags in lost or smh
+#! [x] make json object for devices
+#! [x] parse data in for-loop
+#! [x] db management
+    #! [x] connect to db
+    #! [x] read data from DB
+    #! [x] write data to DB
+    #! [x] change sheet
 
 
-class ScrapDevice():
-    def __init__(self):
-        
-        self.page = ''
-        pass
+with open('settings.json', 'r+', encoding='UTF-8') as file:
+    settings = json.load(file)
 
-    def connectToDevice(self, url:str, cred:list, name:str, auth_key: str) -> str:
-        """
-        Connecting to RCS device using requests. 
-        """
+with open('devices.json', 'r+', encoding='UTF-8') as file:
+    devices = json.load(file)
+
+
+db = dbservice.Database()
+db.dbconn(settings['app_settings']['link_to_db'])
+
+rcu_list = devices['RCU']
+
+#? snippets for for-loop
+# url - rcu_list[i]['URL_address'],
+# login - rcu_list[i]['login'],
+# pass - rcu_list[i]['password']
+# tag - rcu_list[i]['tag']
+# index - rcu_list[i]['index_data']
+# cells - rcu_list[i]['cells']
+# sheet - rcu_list[i]['sheet']
+
+RCU_list_repot = ['RCU_STATUS_REPORT','[____RCU_DEVICE_NAME_______]',]
+
+
+
+def startApp(row_num):
+    
+    for device in rcu_list:
+        print(device)
         try:
-            headers = {'authorization': auth_key}
-            conn = requests.get(url, auth=(cred[0], cred[1]), verify=False, headers=headers)
-            conn.encoding = 'UTF-8' 
-            print(f'!INFO Connected to device {name}, status code:', conn.status_code)
-            self.name = name
-            self.page = conn.text
+            scrapper = sc.ScrapDevice()
+            scrapper.connectToDevice(rcu_list[device]['URL_address'],
+                                    [rcu_list[device]['login'], 
+                                    rcu_list[device]['password']],
+                                    device)
+            print(f'    !INFO {device} reached!')
+            raw_data = scrapper.scrapData(rcu_list[device]['tag'])
+            n = 0
+            data = []
+            cells = []
+            
+            for i in rcu_list[device]['index_data']:
+                data.append(raw_data[i])
+
+            for i in rcu_list[device]['cells']:
+                cells.append(str(i)+str(row_num))
+            try:
+                db.insertToDB(str(rcu_list[device]['sheet']), cells, data)
+                RCU_list_repot.append(f'{device} added')
+            except Exception as ex:
+                RCU_list_repot.append(f'{device} ERROR<---')
+                print('    !ERROR when trying insert data\n', ex)
             
         except Exception as ex:
-            print('!ERROR',ex)
-            input('press enter to exit')
+            print(ex)
+    print(RCU_list_repot)
 
-    #need to call this method with class tag (c_tag) and id tag (id_tag) passed
-    def scrapData(self, c_tag:str, tag:str ):
-        """
-        Scraping data from RCS device page
-        """
-        try:
-            soup = BeautifulSoup(self.page, 'lxml')
-            print('!INFO SOUP', soup)
-            data = soup.find(class_=c_tag)
-            print(data)
-            input('press enter to exit')
-        except Exception as ex:
-            print('!ERROR', ex)
-            input('press enter to exit')    
-
+def save_to_db():
+    db.saveDb()
+    print('    !INFO DB Saving OK')
         
 
-if __name__ == "__main__":
-    #test data NEED TO DELETE THIS AFTER MAKE FULL APP
-    url = 'https://10.29.1.3/config/tx_radio_microtec/?id=5'
-    login = 'admin'
-    password = 'AUcy1-8'
-    auth_key = 'KRC51SRV-D2G1B7DR-BCSMPBIN-T6KPBUA7-93IJBO6T-9MD1N4O0'
-    name = 'Radio Rossii TF 5000'
-    cred = [login, password]
+if __name__ == '__main__':
 
+    print("""
+ ____   _    ____      _    __  __ _____ ___ _   _ ____  _____ ____  
+|  _ \ / \  |  _ \    / \  |  \/  |  ___|_ _| \ | |  _ \| ____|  _ \ 
+| |_) / _ \ | |_) |  / _ \ | |\/| | |_   | ||  \| | | | |  _| | |_) |
+|  __/ ___ \|  _ <  / ___ \| |  | |  _|  | || |\  | |_| | |___|  _ < 
+|_| /_/   \_\_| \_\/_/   \_\_|  |_|_|   |___|_| \_|____/|_____|_| \_\
 
-    testCall = ScrapDevice()
-    testCall.connectToDevice(url, cred, name, auth_key)
-    testCall.scrapData('titan', 'td')
+\nStarted paramfinder ver 2.0.1a
+""")
+
+    startUi = ui.Uinterface()
+    
