@@ -5,23 +5,23 @@ from database import dbservice
     #! [x] get data without tags in lost or smh
 #! [x] make json object for devices
 #! [ ] parse data for devices:
-    #! [ ] 2 tags parse for:
+    #! [x] 2 tags parse for:
         #! [x] rra main params
-        #! [ ] rr bereznik
-        #! [ ] rr kozma
-        #! [ ] rr mezen 
-        #! [ ] rr taiga
-        #! [ ] arh rtrs 1
-        #! [ ] arh rtrs 2
+        #! [x] rr bereznik
+        #! [x] rr kozma
+        #! [x] rr mezen 
+        #! [x] rr taiga
+        #! [x] arh rtrs 1
+        #! [x] arh rtrs 2
     #! [ ] 1 tag parse for: 
-        #! [ ] rra add params 
+        #! [x] rra add params 
         #! [ ] rrs sevsk
         #! [ ] vesti sevsk
         #! [ ] mayak sevsk 
         #! [ ] radio retro
         #! [ ] rr belush guba
         #! [ ] solnce 
-    #! [ ] recievers:
+    #! [x] recievers:
         #! [x] 7100 mux1   
         #! [x] 7100 mux2
         #! [x] rx 8330 mux1
@@ -52,7 +52,7 @@ except:
     print('неуспешное подключение к БД')
 
 rcu_list = devices['RCU']
-rra_device = devices['RCU_RRA']
+rcu_device_fa = devices['RCU_RRA']
 
 #? snippets for for-loop
 # url - rcu_list[i]['URL_address'],
@@ -65,7 +65,10 @@ rra_device = devices['RCU_RRA']
 
 RCU_list_repot = ['RCU_STATUS_REPORT','[____RCU_DEVICE_NAME_______]',]
 
+page_massive = []
 
+def showReport():
+    print(RCU_list_repot)
 
 def startApp(row_num):
     
@@ -79,12 +82,13 @@ def startApp(row_num):
                                     device)
             print(f'    !INFO {device} reached!')
             raw_data = scrapper.scrapData(rcu_list[device]['tag'])
-            n = 0
+            page_massive.append(raw_data[1])
+            print(len(raw_data))
             data = []
             cells = []
             
             for i in rcu_list[device]['index_data']:
-                data.append(raw_data[i])
+                data.append(raw_data[0][i])
 
             for i in rcu_list[device]['cells']:
                 cells.append(str(i)+str(row_num))
@@ -98,16 +102,45 @@ def startApp(row_num):
         except Exception as ex:
             print(ex)
 
-    for device in rra_device:
-        print('rra')
-    
+
+    #* Scrapping device througt FindAll method    
+    print('Start parse addit data for RR')
+    print('Massive list', page_massive)
+    for device in rcu_device_fa:
+            print(device)
+            data = []
+            cells = []
+            
+            
+            #parse addit params for rra
+            n = 0
+            for i in rcu_device_fa:
+                scrap = sc.ScrapOffline()
+                raw_data = scrap.scrapData(page_massive[0], c_tag = 'enceladus')
+
+                for i in rcu_device_fa[device]['index_data']:
+                    data.append(raw_data[i])
+
+                for i in rcu_device_fa[device]['cells']:
+                    cells.append(str(i)+str(row_num))
+                n+=1
+                try:
+                    db.insertToDB(('РРА'), cells, data)
+                    RCU_list_repot.append(f'{device} added')
+                except Exception as ex:
+                    RCU_list_repot.append(f'{device} ERROR<---')
+                    print('    !ERROR when trying insert data\n', ex)
+
+    showReport()
+
+
+        
 
 def save_to_db():
     db.saveDb()
     print('    !INFO DB Saving OK')
 
-def showReport():
-    print(RCU_list_repot)
+
         
 
 if __name__ == '__main__':
