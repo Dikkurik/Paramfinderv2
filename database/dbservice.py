@@ -34,10 +34,16 @@ class Database():
         
         n = 0
         curr_sheet = self.workbook[sheet]
-        for i in data:
-            curr_sheet[cells[n]] = data[n]
-            print(cells[n], ':', data[n])
-            n+=1
+        try:
+            for i in data:
+                curr_sheet[cells[n]] = float(data[n])
+                print(cells[n], ':', data[n])
+                n+=1
+        except:
+            for i in data:
+                curr_sheet[cells[n]] = data[n]
+                print(cells[n], ':', data[n])
+                n+=1
         print(f'    !INFO Successfull add data to {sheet} sheet\n')
 
     def findEmptyCell(self) -> str:
