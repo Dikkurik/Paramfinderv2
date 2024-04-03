@@ -1,0 +1,27 @@
+{
+    "RCU":{
+        "TEST_RCU_page":
+            {
+            "URL_address":"http://192.168.1.1", 
+            "login":"admin", "password":"admin", "tag": "titan", 
+            "cells": ["A", "A", "A"], "index_data": [1,2,3], "sheet":"Текущий"
+            }
+    },
+    "RCU_RRA":{
+        "TEST_RCU_page":
+            {
+            "URL_address":"http://192.168.1.1", 
+            "login":"admin", "password":"admin", "tag": "titan", 
+            "cells": ["A", "A", "A"], "index_data": [1,2,3], "sheet":"Текущий"
+            }
+    },
+    "RCU_ADDIT":{
+        "TEST_RCU_page":
+            {
+            "URL_address":"http://192.168.1.1", 
+            "login":"admin", "password":"admin", "tag": "titan", 
+            "cells": ["A", "A", "A"], "index_data": [1,2,3], "sheet":"Текущий",
+            "massive_pos": 5
+            }
+    }
+}

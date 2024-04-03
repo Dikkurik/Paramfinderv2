@@ -33,6 +33,9 @@ from database import dbservice
     #! [x] read data from DB
     #! [x] write data to DB
     #! [x] change sheet
+    #! [ ] convert data type??
+
+# enceladus tag have all data i need, better parse them 
 
 try:
     with open('settings.json', 'r+', encoding='UTF-8') as file:
@@ -53,6 +56,7 @@ except:
 
 rcu_list = devices['RCU']
 rcu_device_fa = devices['RCU_RRA']
+rcu_device_addit = devices['RCU_ADDIT']
 
 #? snippets for for-loop
 # url - rcu_list[i]['URL_address'],
@@ -65,33 +69,34 @@ rcu_device_fa = devices['RCU_RRA']
 
 RCU_list_repot = ['RCU_STATUS_REPORT','[____RCU_DEVICE_NAME_______]',]
 
-page_massive = []
+page_massive = [] # массив в который сохраняются страницы для оффлайн парсинга 
 
 def showReport():
     print(RCU_list_repot)
 
 def startApp(row_num):
-    
+    # main parsing data
     for device in rcu_list:
         print(device)
         try:
             scrapper = sc.ScrapDevice()
-            scrapper.connectToDevice(rcu_list[device]['URL_address'],
+            scrapper.connectToDevice(rcu_list[device]['URL_address'], 
                                     [rcu_list[device]['login'], 
                                     rcu_list[device]['password']],
                                     device)
             print(f'    !INFO {device} reached!')
             raw_data = scrapper.scrapData(rcu_list[device]['tag'])
-            page_massive.append(raw_data[1])
+            page_massive.append(raw_data[1]) #adding page to massive for offline parsing
             print(len(raw_data))
             data = []
             cells = []
             
             for i in rcu_list[device]['index_data']:
-                data.append(raw_data[0][i])
+                data.append(raw_data[0][i]) # make massive with rad data
 
             for i in rcu_list[device]['cells']:
-                cells.append(str(i)+str(row_num))
+                cells.append(str(i)+str(row_num)) # make massive with table cells 
+
             try:
                 db.insertToDB(str(rcu_list[device]['sheet']), cells, data)
                 RCU_list_repot.append(f'{device} added')
@@ -103,16 +108,17 @@ def startApp(row_num):
             print(ex)
 
 
-    #* Scrapping device througt FindAll method    
+    # Scrapping device througt FindAll method    
     print('Start parse addit data for RR')
     print('Massive list', page_massive)
+    
+    # parse addit params for rra #! <--- NEED TO CHECK IT 
     for device in rcu_device_fa:
             print(device)
             data = []
             cells = []
             
             
-            #parse addit params for rra
             n = 0
             for i in rcu_device_fa:
                 scrap = sc.ScrapOffline()
@@ -126,6 +132,30 @@ def startApp(row_num):
                 n+=1
                 try:
                     db.insertToDB(('РРА'), cells, data)
+                    RCU_list_repot.append(f'{device} added')
+                except Exception as ex:
+                    RCU_list_repot.append(f'{device} ERROR<---')
+                    print('    !ERROR when trying insert data\n', ex)
+
+    # parse addit devices
+    for device in rcu_device_addit: #! <--- work on that for addit devices
+            print(device)
+            data = []
+            cells = []
+        
+            n = 0
+            for i in rcu_device_addit:  #! <--- need parse throuth cycle 
+                scrap = sc.ScrapOffline()
+                raw_data = scrap.scrapData(page_massive[0], rcu_device_addit[device]['tag'])
+
+                for i in rcu_device_addit[device]['index_data']:
+                    data.append(raw_data[i])
+
+                for i in rcu_device_addit[device]['cells']:
+                    cells.append(str(i)+str(row_num))
+                n+=1
+                try:
+                    db.insertToDB(rcu_device_addit[device]['sheet'], cells, data)
                     RCU_list_repot.append(f'{device} added')
                 except Exception as ex:
                     RCU_list_repot.append(f'{device} ERROR<---')

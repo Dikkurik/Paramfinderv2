@@ -1,0 +1,8 @@
+{
+    "app_settings":
+            {
+                "link_to_db":"test.xlsx",
+                "theme":"dark"
+            }
+
+}

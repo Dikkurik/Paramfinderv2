@@ -2,8 +2,6 @@
 # This file contains utility func's that clear string data
 # and return readable info. 
 
-
-
 tagList = ['<th>','</th>','<tbody>','</tbody>','<td>','</td>','<tr>','</tr>',
            '<th width="50%">','<table>','</table>','<th width="19%">','<th width="24%">',
            '<th width="25%">','<table class="enceladus">','<table class="titan">','<th colspan="2">',' ']
@@ -34,3 +32,19 @@ def getIndexes(params:list) -> list:
     for i in params:
         print(f'index {n}: {i}')
         n+=1
+
+def floatFunc(number):
+    try:
+        return float(number)
+    except:
+        print('Ошибка при попытке преобразования')
+        return (number)
+    
+def roundFucn(number):
+    try:
+        return round(number, 1)
+    except:
+        print('Ошибка в округлении')
+        return number
+
+print(roundFucn(0.765))
