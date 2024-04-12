@@ -88,14 +88,4 @@ class Database():
             print('    !ERROR while saving database', ex)
 
 
-if __name__ == '__main__':
-
-    cells = ['A1', 'A2', 'B3']
-    data = ['test', 123, '765']
-
-    test = Database()
-    test.dbconn ('D:\GIT\Paramfinder v2\\test.xlsx')
-    # test.insertToDB('Лист1', cells, data)
-    print(test.findEmptyCell('Лист1'))
-    # test.saveDb()
 

@@ -46,5 +46,3 @@ def roundFucn(number):
     except:
         print('Ошибка в округлении')
         return number
-
-print(roundFucn(0.765))

@@ -1,6 +1,15 @@
 import ui, scrapper as sc, json
 from database import dbservice 
 
+"""
+ ____   _    ____      _    __  __ _____ ___ _   _ ____  _____ ____  
+|  _ \ / \  |  _ \    / \  |  \/  |  ___|_ _| \ | |  _ \| ____|  _ \ 
+| |_) / _ \ | |_) |  / _ \ | |\/| | |_   | ||  \| | | | |  _| | |_) |
+|  __/ ___ \|  _ <  / ___ \| |  | |  _|  | || |\  | |_| | |___|  _ < 
+|_| /_/   \_\_| \_\/_/   \_\_|  |_|_|   |___|_| \_|____/|_____|_| \_\
+
+"""
+
 #! [x] connect to device in RCU
     #! [x] get data without tags in lost or smh
 #! [x] make json object for devices
@@ -69,7 +78,7 @@ rcu_device_addit = devices['RCU_ADDIT']
 
 RCU_list_repot = ['RCU_STATUS_REPORT','[____RCU_DEVICE_NAME_______]',]
 
-page_massive = [] # массив в который сохраняются страницы для оффлайн парсинга 
+page_massive = [] # array with offline pages
 
 def showReport():
     print(RCU_list_repot)
@@ -86,16 +95,16 @@ def startApp(row_num):
                                     device)
             print(f'    !INFO {device} reached!')
             raw_data = scrapper.scrapData(rcu_list[device]['tag'])
-            page_massive.append(raw_data[1]) #adding page to massive for offline parsing
+            page_massive.append(raw_data[1]) #adding page to array for offline parsing
             print(len(raw_data))
             data = []
             cells = []
             
             for i in rcu_list[device]['index_data']:
-                data.append(raw_data[0][i]) # make massive with rad data
+                data.append(raw_data[0][i]) # make array with rad data
 
             for i in rcu_list[device]['cells']:
-                cells.append(str(i)+str(row_num)) # make massive with table cells 
+                cells.append(str(i)+str(row_num)) # make array with table cells 
 
             try:
                 db.insertToDB(str(rcu_list[device]['sheet']), cells, data)
@@ -110,9 +119,9 @@ def startApp(row_num):
 
     # Scrapping device througt FindAll method    
     print('Start parse addit data for RR')
-    print('Massive list', page_massive)
+    print('array list', page_massive)
     
-    # parse addit params for rra #! <--- NEED TO CHECK IT 
+    # parse addit params for rra (offline) #! <--- NEED TO CHECK IT 
     for device in rcu_device_fa:
             print(device)
             data = []
@@ -121,8 +130,9 @@ def startApp(row_num):
             
             n = 0
             for i in rcu_device_fa:
+                pos = rcu_device_fa[device]['array_pos']
                 scrap = sc.ScrapOffline()
-                raw_data = scrap.scrapData(page_massive[0], c_tag = 'enceladus')
+                raw_data = scrap.scrapData(page_massive[pos], rcu_device_fa[device]['tag'])
 
                 for i in rcu_device_fa[device]['index_data']:
                     data.append(raw_data[i])
@@ -137,7 +147,7 @@ def startApp(row_num):
                     RCU_list_repot.append(f'{device} ERROR<---')
                     print('    !ERROR when trying insert data\n', ex)
 
-    # parse addit devices
+    # parse addit devices (offline)
     for device in rcu_device_addit: #! <--- work on that for addit devices
             print(device)
             data = []
@@ -164,7 +174,6 @@ def startApp(row_num):
     showReport()
 
 
-        
 
 def save_to_db():
     db.saveDb()
