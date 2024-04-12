@@ -42,7 +42,6 @@ from database import dbservice
     #! [x] read data from DB
     #! [x] write data to DB
     #! [x] change sheet
-    #! [ ] convert data type??
 
 # enceladus tag have all data i need, better parse them 
 
@@ -76,12 +75,13 @@ rcu_device_addit = devices['RCU_ADDIT']
 # cells - rcu_list[i]['cells']
 # sheet - rcu_list[i]['sheet']
 
-RCU_list_repot = ['RCU_STATUS_REPORT','[____RCU_DEVICE_NAME_______]',]
+RCU_list_repot = ['RCU_STATUS_REPORT','[____RCU_DEVICE_NAME_______]']
 
-page_massive = [] # array with offline pages
+page_array = [] # array with offline pages
 
 def showReport():
-    print(RCU_list_repot)
+    for i in RCU_list_repot():
+        print(i)
 
 def startApp(row_num):
     # main parsing data
@@ -89,19 +89,19 @@ def startApp(row_num):
         print(device)
         try:
             scrapper = sc.ScrapDevice()
-            scrapper.connectToDevice(rcu_list[device]['URL_address'], 
+            scrapper.connectToDevice(rcu_list[device]['URL_address'],
                                     [rcu_list[device]['login'], 
                                     rcu_list[device]['password']],
                                     device)
             print(f'    !INFO {device} reached!')
             raw_data = scrapper.scrapData(rcu_list[device]['tag'])
-            page_massive.append(raw_data[1]) #adding page to array for offline parsing
+            page_array.append(raw_data[1]) #adding page to array for offline parsing
             print(len(raw_data))
             data = []
             cells = []
             
             for i in rcu_list[device]['index_data']:
-                data.append(raw_data[0][i]) # make array with rad data
+                data.append(raw_data[0][i]) # make array with raw data
 
             for i in rcu_list[device]['cells']:
                 cells.append(str(i)+str(row_num)) # make array with table cells 
@@ -119,20 +119,19 @@ def startApp(row_num):
 
     # Scrapping device througt FindAll method    
     print('Start parse addit data for RR')
-    print('array list', page_massive)
+    print('array list', page_array)
     
-    # parse addit params for rra (offline) #! <--- NEED TO CHECK IT 
+    # parse addit params for rra (offline)
     for device in rcu_device_fa:
             print(device)
             data = []
             cells = []
             
-            
             n = 0
             for i in rcu_device_fa:
                 pos = rcu_device_fa[device]['array_pos']
                 scrap = sc.ScrapOffline()
-                raw_data = scrap.scrapData(page_massive[pos], rcu_device_fa[device]['tag'])
+                raw_data = scrap.scrapData(page_array[pos], rcu_device_fa[device]['tag'])
 
                 for i in rcu_device_fa[device]['index_data']:
                     data.append(raw_data[i])
@@ -155,8 +154,9 @@ def startApp(row_num):
         
             n = 0
             for i in rcu_device_addit:  #! <--- need parse throuth cycle 
+                pos = rcu_device_addit[device]['array_pos']
                 scrap = sc.ScrapOffline()
-                raw_data = scrap.scrapData(page_massive[0], rcu_device_addit[device]['tag'])
+                raw_data = scrap.scrapData(page_array[pos], rcu_device_addit[device]['tag'])
 
                 for i in rcu_device_addit[device]['index_data']:
                     data.append(raw_data[i])

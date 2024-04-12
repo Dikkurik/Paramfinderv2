@@ -53,7 +53,7 @@ class Uinterface():
         button_settings = CTk.CTkButton(master=self.main_frame, 
                                         width= 40, height=40,
                                         fg_color='transparent',
-                                        text='', image = self.cog_image, command= print('test'))
+                                        text='', image = self.cog_image, command= lambda: print('test'))
         button_settings.place(relx=0.05, rely=0.75)
 
         db_status_img = CTk.CTkButton(master=self.main_frame, text='', fg_color='transparent',hover='false', width=40, height=40, image=self.image_to_load)
@@ -83,8 +83,11 @@ class Uinterface():
         self.image_to_load = self.imagedb
 
     def collectData(self):
-        main.startApp(self.num)
-        pass
+        try:
+            main.startApp(self.num)
+            self.status2_var.set(f'Данные сообраны, ошибок: ')
+        except Exception as ex:
+            print('!ERROR', ex)
 
     def dbConnect(self):
         try:
