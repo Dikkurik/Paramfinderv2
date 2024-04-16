@@ -1,4 +1,4 @@
-import ui, scrapper as sc, json
+import ui.ui as ui, appfunc.scrapper as sc, json
 from database import dbservice 
 
 """
@@ -80,7 +80,7 @@ RCU_list_repot = ['RCU_STATUS_REPORT','[____RCU_DEVICE_NAME_______]']
 page_array = [] # array with offline pages
 
 def showReport():
-    for i in RCU_list_repot():
+    for i in RCU_list_repot:
         print(i)
 
 def startApp(row_num):
