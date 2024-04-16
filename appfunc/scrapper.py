@@ -15,11 +15,13 @@ class ScrapDevice():
         o = Options(); o.add_argument('--headless') 
         self.driver = webdriver.Firefox(service=s, options=o)
         print('    !INFO Run container... Loading web page...')
+
         self.page = ''
+
         config = configparser.ConfigParser()
         config.read('config.cfg')
+        self.webPageLoadTime = config['WEB DRIVER']['PageLoadTime']
 
-        
     def connectToDevice(self, url:str, cred:list, name:str) -> str:
         """
         Connecting to RCS device using selenium. 
@@ -31,8 +33,9 @@ class ScrapDevice():
             self.driver.find_element(By.NAME, 'username').send_keys(cred[0])
             self.driver.find_element(By.NAME, 'userpass').send_keys(cred[1])
             self.driver.find_element(By.CLASS_NAME, 'auth_submit').click()
-            # set timer to load page
-            time.sleep(10)
+
+            # set timer to load page, time can be changed from configure.cfg
+            time.sleep(self.webPageLoadTime)
             self.page = self.driver.page_source
             
         except Exception as ex:

@@ -1,5 +1,5 @@
 import customtkinter as CTk
-import tkinter, json, main
+import tkinter, json, main, ui.deviceFrame
 from database import dbservice
 from tkinter import *
 from PIL import Image
@@ -18,10 +18,9 @@ class Uinterface():
         
         self.db = dbservice.Database()
 
-
         self.main_frame = CTk.CTk()
         self.main_frame.title('Paramfinder')
-        self.main_frame.geometry('200x200')
+        self.main_frame.geometry('800x600')
         self.main_frame.resizable(0,0)
 
         self.load_img()
@@ -29,6 +28,7 @@ class Uinterface():
         
         self.main_frame_buttons()
         self.main_frame_labels()
+        self.devices_frame()
 
         self.main_frame.mainloop()
 
@@ -38,26 +38,26 @@ class Uinterface():
         buton_find = CTk.CTkButton(master=self.main_frame, 
                                    text='Найти данные', 
                                    command= lambda: self.find_cell())
-        buton_find.place(relx=0.5, y=20, anchor=tkinter.CENTER)
+        buton_find.place(relx=0.1, y=20, anchor=tkinter.CENTER)
 
         buton_collect = CTk.CTkButton(master=self.main_frame, 
                                       text='Собрать данные',  
                                       command= lambda: self.collectData())
-        buton_collect.place(relx=0.5, y=50, anchor=tkinter.CENTER)
+        buton_collect.place(relx=0.1, y=50, anchor=tkinter.CENTER)
 
         buton_saveData = CTk.CTkButton(master=self.main_frame, 
                                       text='Сохранить данные',  
                                       command= lambda: self.saveToDb())
-        buton_saveData.place(relx=0.5, y=80, anchor=tkinter.CENTER)
+        buton_saveData.place(relx=0.1, y=80, anchor=tkinter.CENTER)
 
         button_settings = CTk.CTkButton(master=self.main_frame, 
                                         width= 40, height=40,
                                         fg_color='transparent',
                                         text='', image = self.cog_image, command= lambda: print('test'))
-        button_settings.place(relx=0.05, rely=0.75)
+        button_settings.place(relx=0.01, rely=0.9)
 
         db_status_img = CTk.CTkButton(master=self.main_frame, text='', fg_color='transparent',hover='false', width=40, height=40, image=self.image_to_load)
-        db_status_img.place(relx=0.75, rely = 0.75)
+        db_status_img.place(relx=0.07, rely = 0.9)
 
         CTk.set_appearance_mode('dark')
         
@@ -74,6 +74,13 @@ class Uinterface():
 
         self.status3_labe = CTk.CTkLabel(master=self.main_frame, textvariable=self.status3_var)
         self.status3_labe.place(relx=0.5, y=150, anchor = tkinter.CENTER)
+
+
+    def devices_frame(self):
+        devicesField = CTk.CTkScrollableFrame(master=self.main_frame, width=580, height=560, bg_color="WHITE")
+        devicesField.place(x=180, y=5, anchor=NW)
+        pass
+
 
     def load_img(self):
         self.cog_image = CTk.CTkImage(light_image=Image.open('image\iconcog.png'), size=(30,30))
