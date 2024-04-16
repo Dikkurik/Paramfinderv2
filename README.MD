@@ -1,4 +1,10 @@
-# Парсер для девайсов СДК через селениум
+# Парсер для девайсов СДК через Selenium, Beautifulsoup4
+
+Библиотеки:
+[Selenium](https://pypi.org/project/selenium/)
+[beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
+[Geckodriver](https://github.com/mozilla/geckodriver/)
+[CustomTkinter](https://customtkinter.tomschimansky.com)
 
 ## Описание main.py
 
@@ -20,7 +26,7 @@
 ## Описание ui.py
 
 ### Интерфейс программы
-Описан основной интерфейс программы. Использованует [CustomTkinter](https://customtkinter.tomschimansky.com).
+Описан основной интерфейс программы. Использованует .
 
 ## Описание dbservice.py
 
