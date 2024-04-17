@@ -5,6 +5,8 @@ from tkinter import *
 from PIL import Image
 
 
+devices = ['test1','test2','test3', 'test4']
+
 class Uinterface():
     def __init__(self):
         self.num = 0
@@ -77,9 +79,8 @@ class Uinterface():
 
 
     def devices_frame(self):
-        devicesField = CTk.CTkScrollableFrame(master=self.main_frame, width=580, height=560, bg_color="WHITE")
-        devicesField.place(x=180, y=5, anchor=NW)
-        pass
+        self.devicesField = CTk.CTkScrollableFrame(master=self.main_frame, width=580, height=560,)
+        self.devicesField.place(x=180, y=5, anchor=NW)
 
 
     def load_img(self):
@@ -108,6 +109,13 @@ class Uinterface():
     def find_cell(self):
         self.num = self.db.findEmptyCell()
         self.status1_var.set(f'Дата ок. Ячейка {self.num}')
+        
+        cord = 10
+        for i in devices:
+            device = ui.deviceFrame.Device()
+            device.drawDevice(self.devicesField, i, cord)
+            cord +=40
+            print('поставил девайс')
         print(self.num)
     
     def saveToDb(self):

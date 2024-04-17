@@ -1,16 +1,30 @@
-import customtkinter as CTk
-import tkinter
-import PIL
+import customtkinter as CTk, main
+from tkinter import *
+from PIL import Image
 
 class Device():
+    """Single device class"""
 
     def __init__(self):
-        pass
+        self.load_img()
 
-    def drawDevice(self, frame):
-        CTk.CTkFrame(master=frame, )
-        
+    def load_img(self):
+        self.device_image = CTk.CTkImage(light_image=Image.open('image\device.png'), size=(30,30))
+        self.deviceOk_image = CTk.CTkImage(light_image=Image.open('image\deviceOk.png'), size=(30,30))
+        self.deviceFail_image = CTk.CTkImage(light_image=Image.open('image\deviceOk.png'), size=(30,30))
 
-        pass
+    def drawDevice(self, frame:object, name:str, cord:int):
+        """
+        Method for drawing single device with name and cord passed
+        """
+        device_frame = CTk.CTkFrame(master=frame, width=200, height=50, border_color="BLACK", border_width=1)
+        device_name = CTk.CTkLabel(master=device_frame, width=60, height=20, text=name)
+        device_icon = CTk.CTkButton(master=device_frame, text='', fg_color='transparent',hover='false', width=40, height=40, image=self.device_image)
+        device_frame.pack(pady=3, anchor=NW)
+        device_name.place(x=60, y=10, anchor=NW)
+        device_icon.place(x=1, y=1)
+
+
+
 
 
