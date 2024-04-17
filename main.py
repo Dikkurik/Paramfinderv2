@@ -1,4 +1,4 @@
-import ui.ui as ui, appfunc.scrapper as sc, json
+import ui.ui as ui, appfunc.scrapper as sc, json, configparser
 from database import dbservice 
 
 """
@@ -43,7 +43,6 @@ from database import dbservice
     #! [x] write data to DB
     #! [x] change sheet
 
-# enceladus tag have all data i need, better parse them 
 
 try:
     with open('settings.json', 'r+', encoding='UTF-8') as file:
@@ -60,11 +59,14 @@ try:
     db = dbservice.Database()
     db.dbconn(settings['app_settings']['link_to_db'])
 except:
-    print('неуспешное подключение к БД')
+    print('Неуспешное подключение к БД')
 
 rcu_list = devices['RCU']
 rcu_device_fa = devices['RCU_RRA']
 rcu_device_addit = devices['RCU_ADDIT']
+
+config = configparser.ConfigParser()
+config.read("config.cfg")
 
 #? snippets for for-loop
 # url - rcu_list[i]['URL_address'],

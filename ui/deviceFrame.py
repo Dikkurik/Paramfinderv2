@@ -13,9 +13,9 @@ class Device():
         self.deviceOk_image = CTk.CTkImage(light_image=Image.open('image\deviceOk.png'), size=(30,30))
         self.deviceFail_image = CTk.CTkImage(light_image=Image.open('image\deviceOk.png'), size=(30,30))
 
-    def drawDevice(self, frame:object, name:str, cord:int):
+    def drawDevice(self, frame:object, name:str):
         """
-        Method for drawing single device with name and cord passed
+        Method for drawing single device with name passed
         """
         device_frame = CTk.CTkFrame(master=frame, width=200, height=50, border_color="BLACK", border_width=1)
         device_name = CTk.CTkLabel(master=device_frame, width=60, height=20, text=name)
