@@ -1,5 +1,5 @@
 import customtkinter as CTk
-import tkinter, json, main, ui.deviceFrame
+import tkinter, json, main, ui.deviceFrame, ui.settingsFrame, ui.deviceManagerUI
 from database import dbservice
 from tkinter import *
 from PIL import Image
@@ -54,14 +54,19 @@ class Uinterface():
 
         button_settings = CTk.CTkButton(master=self.main_frame, 
                                         width= 40, height=40,
-                                        fg_color='transparent',
-                                        text='', image = self.cog_image, command= lambda: print('test'))
+                                        fg_color='transparent', text='', image = self.cog_image, 
+                                        command= lambda: ui.settingsFrame.settings_Frame())
         button_settings.place(relx=0.01, rely=0.9)
+
+        button_deviceManger = CTk.CTkButton(master=self.main_frame, 
+                                            text='Менеджер устройств',
+                                            command=lambda: ui.deviceManagerUI.showDevices_frame())
+        button_deviceManger.place(relx=0.1, rely=0.8, anchor=CENTER)
 
         db_status_img = CTk.CTkButton(master=self.main_frame, text='', fg_color='transparent',hover='false', width=40, height=40, image=self.image_to_load)
         db_status_img.place(relx=0.07, rely = 0.9)
 
-        CTk.set_appearance_mode('dark')
+        CTk.set_appearance_mode(main.config["USER INTERFACE"]["theme"])
         
     def main_frame_labels(self):
         self.status1_var = StringVar()
@@ -90,6 +95,16 @@ class Uinterface():
         self.imagedb = CTk.CTkImage(light_image=Image.open('image\database.png'), size=(30,30))
         self.image_to_load = self.imagedb
 
+    def find_cell(self):
+        self.num = self.db.findEmptyCell()
+        self.status1_var.set(f'Дата ок. Ячейка {self.num}')
+
+        for i in devices:
+            device = ui.deviceFrame.Device()
+            device.drawDevice(self.devicesField, i)
+            print('поставил девайс')
+        print(self.num)
+
     def collectData(self):
         try:
             main.startApp(self.num)
@@ -106,17 +121,7 @@ class Uinterface():
             print('!ERROR ', ex)
             self.image_to_load = self.dbFail_image
 
-    def find_cell(self):
-        self.num = self.db.findEmptyCell()
-        self.status1_var.set(f'Дата ок. Ячейка {self.num}')
-        
-        cord = 10
-        for i in devices:
-            device = ui.deviceFrame.Device()
-            device.drawDevice(self.devicesField, i, cord)
-            cord +=40
-            print('поставил девайс')
-        print(self.num)
+
     
     def saveToDb(self):
         try:
