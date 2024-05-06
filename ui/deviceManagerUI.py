@@ -31,20 +31,19 @@ def showDevices_frame():
     rightSide_frame = CTk.CTkScrollableFrame(master=devices_frame, width=680, height=580, border_width=1)
     rightSide_frame.place(x=205,y=5, anchor=NW)
 
-    def showDevicesInArray(array): #! <---- cant pass dict or can't read data from class
-        for i in main.devices[array]:
-            print('name', i)
-            print(main.devices[array][i].values())
-            device_data = main.devices[array][i]
-            print(device_data)
-            print(device_data['URL_address'])
-            deviceInfo = DrawDevice()
-            deviceInfo.drawDevice(rightSide_frame, i, device_data) #! <---- problem there
+    # def showDevicesInArray(array): #! <---- passed last array in divecis.json
+    #     for i in main.devices[array]:
+    #         print('name', i)
+    #         print(main.devices[array][i].values())
+    #         device_data = main.devices[array][i]
+    #         print(device_data)
+    #         print(device_data['URL_address'])
+    #         deviceInfo = DrawDevice()
+    #         deviceInfo.drawDevice(rightSide_frame, i, device_data) #! <---- problem there
 
     for i in main.devices:
-        button_deviceArray = CTk.CTkButton(master=leftSide_frame, width=190, height=50, text=i,
-                                command= lambda: showDevicesInArray(i))
-        button_deviceArray.pack(pady=4)
+        btn = deviceArrayBtn(i, leftSide_frame, rightSide_frame)
+        btn.drawButton()
 
     devices_frame.mainloop()
 
@@ -86,5 +85,28 @@ class DrawDevice():
 
 
 
+class deviceArrayBtn():
+    '''
+    Class for drawing button and devices to the left and side frame of device
+    manager
+    '''
+    def __init__ (self, name, left_frame, right_frame):
+        self.name = name
+        self.left_frame = left_frame
+        self.right_frame = right_frame
         
 
+    def showDevicesInArray(self, array): #! <---- passed last array in divecis.json
+        for i in main.devices[array]:
+            print('name', i)
+            print(main.devices[array][i].values())
+            device_data = main.devices[array][i]
+            print(device_data)
+            print(device_data['URL_address'])
+            deviceInfo = DrawDevice()
+            deviceInfo.drawDevice(self.right_frame, i, device_data) #! <---- problem there
+
+    def drawButton(self):
+        button_deviceArray = CTk.CTkButton(master=self.left_frame, width=190, height=50, text=self.name,
+                                command= lambda: self.showDevicesInArray(self.name))
+        button_deviceArray.pack(pady=4)

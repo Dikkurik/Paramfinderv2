@@ -1,5 +1,5 @@
 #own modules
-import utility, time, configparser, main
+import appfunc.utility as utility, time, main
 
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
@@ -17,7 +17,7 @@ class ScrapDevice():
         print('    !INFO Run container... Loading web page...')
 
         self.page = ''
-        self.webPageLoadTime = main.config['WEB DRIVER']['PageLoadTime']
+        self.webPageLoadTime = int(main.config['WEB DRIVER']['PageLoadTime'])
 
     def connectToDevice(self, url:str, cred:list, name:str) -> str:
         """

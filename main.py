@@ -1,4 +1,5 @@
 import ui.ui as ui, appfunc.scrapper as sc, json, configparser
+import appfunc.utility 
 from database import dbservice 
 
 """
@@ -9,79 +10,44 @@ from database import dbservice
 |_| /_/   \_\_| \_\/_/   \_\_|  |_|_|   |___|_| \_|____/|_____|_| \_\\
 
 """
-
-#! [x] connect to device in RCU
-    #! [x] get data without tags in lost or smh
-#! [x] make json object for devices
-#! [ ] parse data for devices:
-    #! [x] 2 tags parse for:
-        #! [x] rra main params
-        #! [x] rr bereznik
-        #! [x] rr kozma
-        #! [x] rr mezen 
-        #! [x] rr taiga
-        #! [x] arh rtrs 1
-        #! [x] arh rtrs 2
-    #! [ ] 1 tag parse for: 
-        #! [x] rra add params 
-        #! [ ] rrs sevsk
-        #! [ ] vesti sevsk
-        #! [ ] mayak sevsk 
-        #! [ ] radio retro
-        #! [ ] rr belush guba
-        #! [ ] solnce 
-    #! [x] recievers:
-        #! [x] 7100 mux1   
-        #! [x] 7100 mux2
-        #! [x] rx 8330 mux1
-        #! [x] rx 8330 mux2
-        #! [x] trk 555
-        #! [x] trk 575
-#! [x] db management
-    #! [x] connect to db
-    #! [x] read data from DB
-    #! [x] write data to DB
-    #! [x] change sheet
-
-
+# open settings file #! <-- migrate to config
 try:
     with open('settings.json', 'r+', encoding='UTF-8') as file:
         settings = json.load(file)
 except:
     print('Не найден файл настроек')
 
+# open diveces list from json
 try:
     with open('devices.json', 'r+', encoding='UTF-8') as file:
         devices = json.load(file)
 except:
     print('Не найден файл со списком устройств')
+
+# trying to connect exel file
 try:
     db = dbservice.Database()
     db.dbconn(settings['app_settings']['link_to_db'])
 except:
     print('Неуспешное подключение к БД')
 
+# define arrays with devices list
 rcu_list = devices['RCU']
 rcu_device_fa = devices['RCU_RRA']
 rcu_device_addit = devices['RCU_ADDIT']
 
+# define config 
 config = configparser.ConfigParser()
 config.read("config.cfg")
 
-#? snippets for for-loop
-# url - rcu_list[i]['URL_address'],
-# login - rcu_list[i]['login'],
-# pass - rcu_list[i]['password']
-# tag - rcu_list[i]['tag']
-# index - rcu_list[i]['index_data']
-# cells - rcu_list[i]['cells']
-# sheet - rcu_list[i]['sheet']
+# define report list
+RCU_list_repot = []
 
-RCU_list_repot = ['RCU_STATUS_REPORT','[____RCU_DEVICE_NAME_______]']
-
-page_array = [] # array with offline pages
+# array with offline pages
+page_array = [] 
 
 def showReport():
+    print('RCU_STATUS_REPORT__________\n[____RCU_DEVICE_NAME_______]')
     for i in RCU_list_repot:
         print(i)
 
@@ -97,16 +63,19 @@ def startApp(row_num):
                                     device)
             print(f'    !INFO {device} reached!')
             raw_data = scrapper.scrapData(rcu_list[device]['tag'])
-            page_array.append(raw_data[1]) #adding page to array for offline parsing
+            #adding page to array for offline parsing
+            page_array.append(raw_data[1]) 
             print(len(raw_data))
             data = []
             cells = []
             
             for i in rcu_list[device]['index_data']:
-                data.append(raw_data[0][i]) # make array with raw data
+                # make array with raw data
+                data.append(raw_data[0][i]) 
 
             for i in rcu_list[device]['cells']:
-                cells.append(str(i)+str(row_num)) # make array with table cells 
+                # make array with table cells 
+                cells.append(str(i)+str(row_num)) 
 
             try:
                 db.insertToDB(str(rcu_list[device]['sheet']), cells, data)
@@ -128,12 +97,14 @@ def startApp(row_num):
             print(device)
             data = []
             cells = []
-            
+            mod_ind = rcu_device_fa[device]['mod_index']
+            mod_cell = rcu_device_fa[device]['mod_cell']
             n = 0
             for i in rcu_device_fa:
                 pos = rcu_device_fa[device]['array_pos']
                 scrap = sc.ScrapOffline()
                 raw_data = scrap.scrapData(page_array[pos], rcu_device_fa[device]['tag'])
+                
 
                 for i in rcu_device_fa[device]['index_data']:
                     data.append(raw_data[i])
@@ -141,6 +112,19 @@ def startApp(row_num):
                 for i in rcu_device_fa[device]['cells']:
                     cells.append(str(i)+str(row_num))
                 n+=1
+
+                try:
+                    print('Index 70',raw_data[mod_ind])
+                    mod_data = appfunc.utility.checkModulatorRRA(raw_data[mod_ind])
+                    print(mod_data)
+                    print('Модулятор в работе', mod_data)
+                    db.insertToDB(('Текущий'), str(mod_cell)+str(row_num), mod_data) #! <--- ошибка "Tuple object has no attribute value"
+                    RCU_list_repot.append(f'{device} added')
+                    
+                except Exception as ex:
+                    RCU_list_repot.append(f'{device} ERROR<---')
+                    print('    !ERROR when trying insert data\n', ex)
+
                 try:
                     db.insertToDB(('РРА'), cells, data)
                     RCU_list_repot.append(f'{device} added')
@@ -175,14 +159,10 @@ def startApp(row_num):
 
     showReport()
 
-
-
 def save_to_db():
     db.saveDb()
     print('    !INFO DB Saving OK')
 
-
-        
 
 if __name__ == '__main__':
 
