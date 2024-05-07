@@ -3,18 +3,12 @@ import tkinter, json, main, ui.deviceFrame, ui.settingsFrame, ui.deviceManagerUI
 from database import dbservice
 from tkinter import *
 from PIL import Image
+from main import dbconn
 
 
 class Uinterface():
     def __init__(self):
         self.num = 0
-
-        # открытие файла настроек
-        try:
-            with open('settings.json', 'r+') as file:
-                self.settings = json.load(file)
-        except Exception as ex:
-            print('!ERROR ', ex)
         
         self.db = dbservice.Database()
 
@@ -110,12 +104,9 @@ class Uinterface():
             print('!ERROR ', ex)
 
     def dbConnect(self):
-        try:
-            self.db.dbconn(self.settings['app_settings']['link_to_db'])
+        if dbconn == True:
             self.image_to_load = self.dbOk_image
-
-        except Exception as ex:
-            print('!ERROR ', ex)
+        else:
             self.image_to_load = self.dbFail_image
 
 
