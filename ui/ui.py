@@ -5,8 +5,6 @@ from tkinter import *
 from PIL import Image
 
 
-devices = ['test1','test2','test3', 'test4']
-
 class Uinterface():
     def __init__(self):
         self.num = 0
@@ -60,7 +58,7 @@ class Uinterface():
 
         button_deviceManger = CTk.CTkButton(master=self.main_frame, 
                                             text='Менеджер устройств',
-                                            command=lambda: ui.deviceManagerUI.showDevices_frame())
+                                            command=lambda: ui.deviceManagerUI.devicesManager_frame())
         button_deviceManger.place(relx=0.1, rely=0.8, anchor=CENTER)
 
         db_status_img = CTk.CTkButton(master=self.main_frame, text='', fg_color='transparent',hover='false', width=40, height=40, image=self.image_to_load)
@@ -98,17 +96,16 @@ class Uinterface():
     def find_cell(self):
         self.num = self.db.findEmptyCell()
         self.status1_var.set(f'Дата ок. Ячейка {self.num}')
-
-        for i in devices:
-            device = ui.deviceFrame.Device()
-            device.drawDevice(self.devicesField, i)
-            print('поставил девайс')
         print(self.num)
 
     def collectData(self):
         try:
             main.startApp(self.num)
             self.status2_var.set(f'Данные сообраны, ошибок: ')
+            for i in main.RCU_list_repot:
+                device = ui.deviceFrame.Device()
+                device.drawDevice(self.devicesField, i)
+                print('поставил девайс')
         except Exception as ex:
             print('!ERROR ', ex)
 

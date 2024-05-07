@@ -2,6 +2,7 @@
 # This file contains utility func's that clear string data
 # and return readable info. 
 
+
 tagList = ['<th>','</th>','<tbody>','</tbody>','<td>','</td>','<tr>','</tr>',
            '<th width="50%">','<table>','</table>','<th width="19%">','<th width="24%">',
            '<th width="25%">','<table class="enceladus">','<table class="titan">','<th colspan="2">',' ']
@@ -56,3 +57,5 @@ def checkModulatorRRA(data):
 
 def makeParamArray(device_name, params): #! <--- need to finish this
     pass
+
+

@@ -1,4 +1,4 @@
-import customtkinter as CTk, main
+import customtkinter as CTk
 from tkinter import *
 from PIL import Image
 
