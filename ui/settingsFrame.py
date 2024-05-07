@@ -1,31 +1,25 @@
 import customtkinter as CTk, ui.deviceManagerUI
+from customtkinter import filedialog  
 from main import config
 from tkinter import *
+
 from PIL import Image
 
-
-# need to defive buttons and device manager
-
-def settings_Frame():
+def settings_Frame(deviceFrame):
     """
     Frame for settings and device manager
     """
 
-    settingsFrame = CTk.CTk()
-    settingsFrame.geometry("900x600")
-    settingsFrame.title('Настройки')
-    settingsFrame.resizable(0,0)
+    settingsFrame = CTk.CTkFrame(master=deviceFrame, width=797, height= 597, border_width=1)
+    settingsFrame.place(x=1, y=1, anchor=NW)
 
     leftSide_frame = CTk.CTkFrame(master=settingsFrame, width=200, height=580, border_width=1)
     leftSide_frame.place(x=5,y=5, anchor=NW)
 
-    rightSide_frame = CTk.CTkFrame(master=settingsFrame, width=680, height=580, border_width=1)
-    rightSide_frame.place(x=205,y=5, anchor=NW)
+    rightSide_frame = CTk.CTkFrame(master=settingsFrame, width=595, height=580, border_width=1)
+    rightSide_frame.place(x=200,y=5, anchor=NW)
 
     # Buttons
-    button_showDevices = CTk.CTkButton(master=leftSide_frame, width=40, height=40, text='Показать устройства', 
-                                    command= lambda: ui.deviceManagerUI.showDevices_frame())
-    button_showDevices.pack(pady=10)
 
     button_lightTheme = CTk.CTkButton(master=leftSide_frame, width=40, height=40, text='Светлая тема', 
                                     command= lambda: switchToLight())
@@ -35,23 +29,43 @@ def settings_Frame():
                                     command= lambda: switchToDark())
     button_lightTheme.pack(pady=10)
 
+    button_update = CTk.CTkButton(master=leftSide_frame, width=30, height=30, text='Обновить окно' , 
+                                    command= lambda: update_frame(settingsFrame, deviceFrame), fg_color="GREEN")
+    button_update.pack(pady=10)
+
+
     button_setTime = CTk.CTkButton(master=rightSide_frame, width=30, height=30, text='+' , 
-                                    command= lambda: gettextbox())
+                                    command= lambda: savetocfg(pageload_textbox, 'pageloadtime'))
     button_setTime.place(x= 230, y=15)
+
+    button_exit = CTk.CTkButton(master=leftSide_frame, width=30, height=30, text='Закрыть окно' , 
+                                    command= lambda: killframe(settingsFrame), fg_color="RED")
+    button_exit.pack(pady=10)
+
+    
+
+    
 
     # Textbox and labels
     pageload_label = CTk.CTkLabel(master=rightSide_frame, width=180, height=40, text='Время загрузки страницы')
-    pageload_label.place(x=10, y=10)
+    pageload_label.place(x=10, y=10, anchor=NW)
+
+    pageload_label_curr = CTk.CTkLabel(master=rightSide_frame, width=180, height=40, 
+                                       text=f'Текущее Время загрузки страницы : {config["APP SETTINGS"]["pageloadtime"]}')
+    pageload_label_curr.place(x=280, y=10, anchor=NW)
 
     pageload_textbox = CTk.CTkTextbox(master=rightSide_frame, width=30, height=20, activate_scrollbars=False)
-    pageload_textbox.place(x=200, y=15)
+    pageload_textbox.place(x=200, y=15, anchor=NW)
 
+    dblink_label = CTk.CTkLabel(master=rightSide_frame, width=180, height=40, text='База данных')
+    dblink_label.place(x=10, y=50, anchor=NW)
 
-    # attrs
+    dblink_label_curr = CTk.CTkLabel(master=rightSide_frame, width=180, height=40, text=f'Текущщая ссылка:\n {config["APP SETTINGS"]["link_to_database"]}')
+    dblink_label_curr.place(x=290, y=50, anchor=NW)
 
-    pageload_text = pageload_textbox.get('1.0', END)
+    dblink_dialogue = CTk.CTkButton(master=rightSide_frame, width=30, height=20, text='Обзор', command = lambda: selectfile())
+    dblink_dialogue.place(x=200, y=55, anchor=NW)
 
-    settingsFrame.mainloop()
 
 
 def switchToLight():
@@ -66,7 +80,24 @@ def switchToDark():
     with open('config.cfg', 'w') as f:
         config.write(f)
 
-def gettextbox(): #! <- need to finish this func for getting data from textbox
-    print(settings_Frame.pageload_text)
-    # print(settings_Frame.('1.0', END))
 
+def savetocfg(textbox_object, param):
+        text = textbox_object.get('1.0', 'end-1c')
+        config.set('APP SETTINGS', param, text)
+        with open('config.cfg', 'w') as f:
+            config.write(f)
+
+def update_frame(frame, deviceframe):
+    killframe(frame)
+    settings_Frame(deviceframe)
+
+  
+def selectfile(): #! <--- need to finish it (it work just need to save data)
+        filename = filedialog.askopenfilename()
+        print (filename)
+        config.set('APP SETTINGS', 'link_to_database', filename)
+        with open('config.cfg', 'w') as f:
+            config.write(f)
+
+def killframe(frame):
+    frame.destroy()

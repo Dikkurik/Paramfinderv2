@@ -53,7 +53,7 @@ class Uinterface():
         button_settings = CTk.CTkButton(master=self.main_frame, 
                                         width= 40, height=40,
                                         fg_color='transparent', text='', image = self.cog_image, 
-                                        command= lambda: ui.settingsFrame.settings_Frame())
+                                        command= lambda: ui.settingsFrame.settings_Frame(self.main_frame))
         button_settings.place(relx=0.01, rely=0.9)
 
         button_deviceManger = CTk.CTkButton(master=self.main_frame, 
