@@ -74,7 +74,7 @@ class deviceArrayBtn():
         for i in main.devices[array]:
             device_data = main.devices[array][i]
             deviceInfo = Device()
-            deviceInfo.drawDevice(self.right_frame, i, device_data)
+            deviceInfo.drawDevice(self.right_frame, str(array), str(i), device_data)
 
     def drawButton(self):
         button_deviceArray = CTk.CTkButton(master=self.left_frame, width=190, height=50, text=self.name,

@@ -1,6 +1,6 @@
-import customtkinter as CTk, ui.deviceManagerUI
+import customtkinter as CTk
 from customtkinter import filedialog  
-from main import config
+import main
 from tkinter import *
 
 from PIL import Image
@@ -51,7 +51,7 @@ def settings_Frame(deviceFrame):
     pageload_label.place(x=10, y=10, anchor=NW)
 
     pageload_label_curr = CTk.CTkLabel(master=rightSide_frame, width=180, height=40, 
-                                       text=f'Текущее Время загрузки страницы : {config["APP SETTINGS"]["pageloadtime"]}')
+                                       text=f'Текущее Время загрузки страницы : {main.config["APP SETTINGS"]["pageloadtime"]}')
     pageload_label_curr.place(x=280, y=10, anchor=NW)
 
     pageload_textbox = CTk.CTkTextbox(master=rightSide_frame, width=30, height=20, activate_scrollbars=False)
@@ -60,7 +60,7 @@ def settings_Frame(deviceFrame):
     dblink_label = CTk.CTkLabel(master=rightSide_frame, width=180, height=40, text='База данных')
     dblink_label.place(x=10, y=50, anchor=NW)
 
-    dblink_label_curr = CTk.CTkLabel(master=rightSide_frame, width=180, height=40, text=f'Текущщая ссылка:\n {config["APP SETTINGS"]["link_to_database"]}')
+    dblink_label_curr = CTk.CTkLabel(master=rightSide_frame, width=180, height=40, text=f'Текущщая ссылка:\n {main.config["APP SETTINGS"]["link_to_database"]}')
     dblink_label_curr.place(x=290, y=50, anchor=NW)
 
     dblink_dialogue = CTk.CTkButton(master=rightSide_frame, width=30, height=20, text='Обзор', command = lambda: selectfile())
@@ -69,35 +69,38 @@ def settings_Frame(deviceFrame):
 
 
 def switchToLight():
-    config.set('USER INTERFACE','theme', 'light')
+    main.config.set('USER INTERFACE','theme', 'light')
     
     with open('config.cfg', 'w') as f:
-        config.write(f)
+        main.config.write(f)
 
 def switchToDark():
-    config.set('USER INTERFACE','theme', 'dark')
+    main.config.set('USER INTERFACE','theme', 'dark')
     
     with open('config.cfg', 'w') as f:
-        config.write(f)
+        main.config.write(f)
 
 
 def savetocfg(textbox_object, param):
         text = textbox_object.get('1.0', 'end-1c')
-        config.set('APP SETTINGS', param, text)
+        main.config.set('APP SETTINGS', param, text)
         with open('config.cfg', 'w') as f:
-            config.write(f)
+            main.config.write(f)
 
 def update_frame(frame, deviceframe):
     killframe(frame)
     settings_Frame(deviceframe)
 
   
-def selectfile(): #! <--- need to finish it (it work just need to save data)
+def selectfile():
         filename = filedialog.askopenfilename()
-        print (filename)
-        config.set('APP SETTINGS', 'link_to_database', filename)
-        with open('config.cfg', 'w') as f:
-            config.write(f)
+        if filename != None:
+            print (filename)
+            main.config.set('APP SETTINGS', 'link_to_database', filename)
+            with open('config.cfg', 'w') as f:
+                main.config.write(f)
+        else:
+             return None
 
 def killframe(frame):
     frame.destroy()

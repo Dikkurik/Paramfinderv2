@@ -50,12 +50,13 @@ def roundFucn(number):
 
 def checkModulatorRRA(data):
     if data == 'Вкл.':
-        return 'AB'
+        return ['AB']
     else:
-        return 'BA'
+        return ['BA']
 
 
 def makeParamArray(device_name, params): #! <--- need to finish this
     pass
+
 
 

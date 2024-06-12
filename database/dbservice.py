@@ -5,7 +5,7 @@ import datetime as dt
 class Database():
     def __init__(self):
         """
-        define params when class is callde
+        Define params when class is callde
         workbook - define exel table
         sheet - define sheet of exel table
         time - define current pc time and get today day
@@ -16,15 +16,18 @@ class Database():
         self.num=4
         self.time = str(dt.datetime.utcnow()).split(' ')[0]
 
-    def dbconn(self, linkToDB:str):
+    def dbconn(self, linkToDB:str) -> bool:
         """
         Func that connect to DB using path to exel file
+        
         """
         try:
             self.workbook = load_workbook(filename=linkToDB)
             self.link = linkToDB
+            return True
         except:
             print('    !ERROR connect to db\n')
+            return False
 
     def insertToDB(self, sheet:str, cells:list, data:list):
         """

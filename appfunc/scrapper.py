@@ -1,12 +1,10 @@
 #own modules
 import appfunc.utility as utility, time, main
-
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
-
 
 
 class ScrapDevice():
@@ -17,7 +15,7 @@ class ScrapDevice():
         print('    !INFO Run container... Loading web page...')
 
         self.page = ''
-        self.webPageLoadTime = int(main.config['WEB DRIVER']['PageLoadTime'])
+        self.webPageLoadTime = int(main.config['APP SETTINGS']['PageLoadTime'])
 
     def connectToDevice(self, url:str, cred:list, name:str) -> str:
         """
@@ -55,6 +53,7 @@ class ScrapDevice():
             print('    !INFO Gathered parametrs:\n', params)
             return params, self.page
         except Exception as ex:
+            main.RCU_list_repot.append(self.name, 'ERROR <----')
             print('    !ERROR\n', ex)
 
 

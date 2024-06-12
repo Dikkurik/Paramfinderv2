@@ -1,16 +1,14 @@
 import customtkinter as CTk
-import tkinter, json, main, ui.deviceFrame, ui.settingsFrame, ui.deviceManagerUI
-from database import dbservice
+import tkinter, ui.deviceFrame, ui.settingsFrame, ui.deviceManagerUI, main
 from tkinter import *
 from PIL import Image
-from main import dbconn
 
 
 class Uinterface():
     def __init__(self):
         self.num = 0
         
-        self.db = dbservice.Database()
+        self.database = main.db
 
         self.main_frame = CTk.CTk()
         self.main_frame.title('Paramfinder')
@@ -66,13 +64,13 @@ class Uinterface():
         self.status3_var = StringVar()
 
         self.status1_labe = CTk.CTkLabel(master=self.main_frame, textvariable=self.status1_var)
-        self.status1_labe.place(relx=0.5, y=110, anchor = tkinter.CENTER)
+        self.status1_labe.place(relx=0.1, y=110, anchor = tkinter.CENTER)
 
         self.status2_labe = CTk.CTkLabel(master=self.main_frame, textvariable=self.status2_var)
-        self.status2_labe.place(relx=0.5, y=130, anchor = tkinter.CENTER)
+        self.status2_labe.place(relx=0.1, y=130, anchor = tkinter.CENTER)
 
         self.status3_labe = CTk.CTkLabel(master=self.main_frame, textvariable=self.status3_var)
-        self.status3_labe.place(relx=0.5, y=150, anchor = tkinter.CENTER)
+        self.status3_labe.place(relx=0.1, y=150, anchor = tkinter.CENTER)
 
 
     def devices_frame(self):
@@ -88,14 +86,18 @@ class Uinterface():
         self.image_to_load = self.imagedb
 
     def find_cell(self):
-        self.num = self.db.findEmptyCell()
-        self.status1_var.set(f'Дата ок. Ячейка {self.num}')
-        print(self.num)
+        self.num = self.database.findEmptyCell()
+        if self.num == False:
+            self.status1_var.set(f'Дата не ок. Ячейка {self.num}')
+        else:
+            self.status1_var.set(f'Дата ок. Ячейка {self.num}')
+            print(self.num)
 
     def collectData(self):
         try:
             main.startApp(self.num)
             self.status2_var.set(f'Данные сообраны, ошибок: ')
+            #draw status report in main window
             for i in main.RCU_list_repot:
                 device = ui.deviceFrame.Device()
                 device.drawDevice(self.devicesField, i)
@@ -104,7 +106,7 @@ class Uinterface():
             print('!ERROR ', ex)
 
     def dbConnect(self):
-        if dbconn == True:
+        if main.dbconn == True:
             self.image_to_load = self.dbOk_image
         else:
             self.image_to_load = self.dbFail_image
