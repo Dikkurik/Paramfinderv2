@@ -60,3 +60,10 @@ def makeParamArray(device_name, params): #! <--- need to finish this
 
 
 
+def savePage(page, name):
+
+    print("Saving devica page to file ", name)
+    with open(f"files/{name}.html", "w", encoding="UTF-8") as blank_file:
+                blank_file.write(page)
+        
+

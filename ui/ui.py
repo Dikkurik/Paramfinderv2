@@ -8,7 +8,7 @@ class Uinterface():
     def __init__(self):
         self.num = 0
         
-        self.database = main.db
+        self.database = main.database
 
         self.main_frame = CTk.CTk()
         self.main_frame.title('Paramfinder')
@@ -106,7 +106,7 @@ class Uinterface():
             print('!ERROR ', ex)
 
     def dbConnect(self):
-        if main.dbconn == True:
+        if main.database == True:
             self.image_to_load = self.dbOk_image
         else:
             self.image_to_load = self.dbFail_image

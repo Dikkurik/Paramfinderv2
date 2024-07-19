@@ -8,53 +8,59 @@ from bs4 import BeautifulSoup
 
 
 class ScrapDevice():
-    def __init__(self):
+
+    def __init__(self, name:str , url:str, cred:list, c_tag):
         s = Service('firefoxdrivers/geckodriver') 
-        o = Options(); o.add_argument('--headless') 
+        o = Options(); # o.add_argument('--headless') 
         self.driver = webdriver.Firefox(service=s, options=o)
         print('    !INFO Run container... Loading web page...')
+        self.name = name
+        self.url = url
+        self.cred = cred
+        self.c_tag = c_tag
 
-        self.page = ''
-        self.webPageLoadTime = int(main.config['APP SETTINGS']['PageLoadTime'])
-
-    def connectToDevice(self, url:str, cred:list, name:str) -> str:
+    def connectToDevice(self, ) -> str:
         """
         Connecting to RCS device using selenium. 
         """
         try:
-            conn = self.driver.get(url) 
-            print(f'    !INFO Connected to device {name}')
-            self.name = name
-            self.driver.find_element(By.NAME, 'username').send_keys(cred[0])
-            self.driver.find_element(By.NAME, 'userpass').send_keys(cred[1])
-            self.driver.find_element(By.CLASS_NAME, 'auth_submit').click()
-
-            # set timer to load page, time can be changed from configure.cfg
-            time.sleep(self.webPageLoadTime)
-            self.page = self.driver.page_source
+            conn = self.driver.get(self.url) 
             
+            print(f'    !INFO Connected to device {self.name}')
+            self.driver.find_element(By.NAME, 'username').send_keys(self.cred[0])
+            self.driver.find_element(By.NAME, 'userpass').send_keys(self.cred[1])
+            self.driver.find_element(By.CLASS_NAME, 'auth_submit').click()
         except Exception as ex:
             print('    !ERROR\n',ex)
-
-        finally:
-            self.driver.close()
-            self.driver.quit()
-            print('    !INFO Close container...')
+    
+         
+    
 
     #need to call this method with class tag (c_tag) and id tag (id_tag) passed
     def scrapData(self, c_tag:str) -> list:
         """
         Scraping data from RCS device page
         """
+
         try:
-            soup = BeautifulSoup(self.page, 'lxml')
+            soup = BeautifulSoup(self.driver.page_source, 'lxml')
             data = soup.find(class_=c_tag).find_all('td')
             params = utility.makeIndexList(data)
             print('    !INFO Gathered parametrs:\n', params)
-            return params, self.page
+            return params
         except Exception as ex:
-            main.RCU_list_repot.append(self.name, 'ERROR <----')
+            main.RCU_list_repot.append(f"{self.name} ERROR <----")
             print('    !ERROR\n', ex)
+
+        
+    def quitDriver(self):
+        self.driver.quit()
+
+    def saveToFile(self):
+        print("page",self.page)
+        print("Saving device page to file ", self.name)
+        with open(f"files/{self.name}.html", "w", encoding="UTF-8") as blank_file:
+                    blank_file.write(self.driver.page_source)
 
 
 

@@ -1,7 +1,8 @@
 import appfunc.scrapper as sc, json, configparser
-import appfunc.utility 
+import appfunc.utility as utility
 from database import dbservice 
 import ui.ui as ui, ui.progresBarFrame as Bar
+
 
 """
  ____   _    ____      _    __  __ _____ ___ _   _ ____  _____ ____  
@@ -30,21 +31,22 @@ except:
 
 # trying to connect exel file
 
-
-try:
-    db = dbservice.Database()
-    print(db)
-    if db.dbconn(config["APP SETTINGS"]["link_to_database"]) == True:
-        dbconn = True
-    else: 
+def dbInit():
+    try:
+        db = dbservice.Database()
+        print(db)
+        if db.dbconn(config["APP SETTINGS"]["link_to_database"]) == True:
+            dbconn = True
+        else: 
+            dbconn = False
+    except:
+        print('Неуспешное подключение к БД')
         dbconn = False
-except:
-    print('Неуспешное подключение к БД')
-    dbconn = False
+    return db
 
+database = dbInit()
 
-
-print('Conn to db: ', dbconn, __name__)
+print('Conn to db: ', database, __name__)
 
 
 
@@ -59,7 +61,7 @@ rcu_device_addit = devices['RCU_ADDIT']
 RCU_list_repot = []
 
 # array with offline pages
-page_array = [] 
+page_name_array = []
 
 def start_ui():
     print("""
@@ -82,21 +84,34 @@ def showReport():
 
 def startApp(row_num):
     # main parsing data
-    for device in rcu_list:
+    def main_parser():
+        browser_list = []
         
-        
-        print(device)
-        try:
-            scrapper = sc.ScrapDevice()
-            scrapper.connectToDevice(rcu_list[device]['URL_address'],
-                                    [rcu_list[device]['login'], 
-                                    rcu_list[device]['password']],
-                                    device)
-            print(f'    !INFO {device} reached!')
-            raw_data = scrapper.scrapData(rcu_list[device]['tag'])
-            #adding page to array for offline parsing
-            device_page = raw_data[1]
-            page_array.append(device_page) 
+        for device in rcu_list:
+            print(device)
+            try:
+                print(f"{device}_file.html")
+                transaction = [
+                        str(device), 
+                        rcu_list[device]['URL_address'],
+                        [rcu_list[device]['login'], rcu_list[device]['password']],
+                        rcu_list[device]['tag']
+                            ]
+                print(transaction)
+                scrapper = sc.ScrapDevice(transaction[0], transaction[1], transaction[2], transaction[3])
+                scrapper.connectToDevice()
+                print('PAGE\n',scrapper.driver.page_source)
+                
+                print(f'    !INFO {device} reached!')
+                browser_list.append(scrapper)
+                #adding page to array for offline parsing
+                page_name_array.append(f'{device}.html')    
+                
+            except Exception as ex:
+                print(ex)
+
+        for i in browser_list:
+            raw_data = i.scrapData()
             print(len(raw_data))
             data = []
             cells = []
@@ -111,21 +126,29 @@ def startApp(row_num):
                 cells.append(cell_id) 
 
             try:
-                db.insertToDB(str(rcu_list[device]['sheet']), cells, data)
+                database.insertToDB(str(rcu_list[device]['sheet']), cells, data)
                 RCU_list_repot.append(f'{device} added')
             except Exception as ex:
                 RCU_list_repot.append(f'{device} ERROR <---')
                 print('    !ERROR when trying insert data\n', ex)
-            
-        except Exception as ex:
-            print(ex)
 
+        for i in browser_list:
+            print("Saved page,", i.name)
+            i.saveToFile()
+            
+        for i in browser_list:
+            i.quitDriver()
+            print(f"Close container")
+               
+    main_parser()
+    print(page_name_array)
 
     # Scrapping device througt FindAll method    
     print('Start parse addit data for RR')
     print('array list', page_array)
     
     # parse addit params for rra (offline)
+    
     for device in rcu_device_fa:
             print(device)
             data = []
@@ -148,13 +171,13 @@ def startApp(row_num):
 
                 try:
                     print('Index 70',raw_data[mod_ind])
-                    mod_data = appfunc.utility.checkModulatorRRA(raw_data[mod_ind])
+                    mod_data = utility.checkModulatorRRA(raw_data[mod_ind])
                     print(mod_data)
                     print('Модулятор в работе', mod_data)
                     mod_cell_list = [str(mod_cell)+str(row_num)]
                     print(' Ячейка модуляторов ',mod_cell_list)
 
-                    db.insertToDB(('Текущий'), mod_cell_list, mod_data)
+                    database.insertToDB(('Текущий'), mod_cell_list, mod_data)
                     RCU_list_repot.append(f'{device} added')
                     
                 except Exception as ex:
@@ -162,12 +185,14 @@ def startApp(row_num):
                     print('    !ERROR when trying insert data\n', ex)
 
                 try:
-                    db.insertToDB(('РРА'), cells, data)
+                    database.insertToDB(('РРА'), cells, data)
                     RCU_list_repot.append(f'{device} added')
                 except Exception as ex:
                     RCU_list_repot.append(f'{device} ERROR <---')
                     print('    !ERROR when trying insert data\n', ex)
 
+    
+    
     # parse addit devices (offline) it takes
     def add_audio():
             print('Try add audio')
@@ -183,12 +208,12 @@ def startApp(row_num):
                 raw_data = scraps.scrapData(page_array[pos], rcu_device_addit[device]['tag'])
 
                 for i in rcu_device_addit[device]['index_data']:
-                    data.append(appfunc.utility.roundFucn(raw_data[i]))
+                    data.append(utility.roundFucn(raw_data[i]))
 
                 cells = rcu_device_addit[device]['cells']
                 n+=1
                 try:
-                    db.insertToDB(rcu_device_addit[device]['sheet'], cells, data)
+                    database.insertToDB(rcu_device_addit[device]['sheet'], cells, data)
                     RCU_list_repot.append(f'{device} Ok')
                 except Exception as ex:
                     RCU_list_repot.append(f'{device} ERROR <----')
@@ -200,9 +225,8 @@ def startApp(row_num):
     showReport()
 
 def save_to_db():
-    db.saveDb()
+    database.saveDb()
     print('    !INFO DB Saving OK')
-
 
 if __name__ == "__main__":
     start_ui()
