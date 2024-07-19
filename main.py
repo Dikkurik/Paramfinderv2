@@ -100,7 +100,6 @@ def startApp(row_num):
                 print(transaction)
                 scrapper = sc.ScrapDevice(transaction[0], transaction[1], transaction[2], transaction[3])
                 scrapper.connectToDevice()
-                print('PAGE\n',scrapper.driver.page_source)
                 
                 print(f'    !INFO {device} reached!')
                 browser_list.append(scrapper)
@@ -111,26 +110,31 @@ def startApp(row_num):
                 print(ex)
 
         for i in browser_list:
-            raw_data = i.scrapData()
-            print(len(raw_data))
-            data = []
-            cells = []
-            
-            for i in rcu_list[device]['index_data']:
-                # make array with raw data
-                data.append(raw_data[0][i]) 
-
-            for i in rcu_list[device]['cells']:
-                # make array with table cells 
-                cell_id = str(i)+str(row_num)
-                cells.append(cell_id) 
-
             try:
-                database.insertToDB(str(rcu_list[device]['sheet']), cells, data)
-                RCU_list_repot.append(f'{device} added')
+                print("Scrap data:", i.name)
+                raw_data = i.scrapData()
+
+                print(len(raw_data))
+                data = []
+                cells = []
+                
+                for i in rcu_list[i.name]['index_data']:
+                    # make array with raw data
+                    data.append(raw_data[i])
+                print("DATA:",data)
+                for i in rcu_list[i.name]['cells']:
+                    # make array with table cells 
+                    cell_id = str(i)+str(row_num)
+                    cells.append(cell_id) 
+                print("INFO:", cells)
+                try:
+                    database.insertToDB(str(rcu_list[i.name]['sheet']), cells, data)
+                    RCU_list_repot.append(f'{i.namw} added')
+                except Exception as ex:
+                    RCU_list_repot.append(f'{i.name} ERROR <---')
+                    print('    !ERROR when trying insert data\n', ex)
             except Exception as ex:
-                RCU_list_repot.append(f'{device} ERROR <---')
-                print('    !ERROR when trying insert data\n', ex)
+                print(ex)
 
         for i in browser_list:
             print("Saved page,", i.name)
@@ -138,14 +142,13 @@ def startApp(row_num):
             
         for i in browser_list:
             i.quitDriver()
-            print(f"Close container")
+            print(f"Closed container", i.name)
                
     main_parser()
     print(page_name_array)
 
     # Scrapping device througt FindAll method    
     print('Start parse addit data for RR')
-    print('array list', page_array)
     
     # parse addit params for rra (offline)
     
@@ -156,10 +159,12 @@ def startApp(row_num):
             mod_ind = rcu_device_fa[device]['mod_index']
             mod_cell = rcu_device_fa[device]['mod_cell']
             n = 0
-            for i in rcu_device_fa:
+            for device in rcu_device_fa:
                 pos = rcu_device_fa[device]['array_pos']
+                with open (f"/files/{str(device)}.html" , "r", encoding="UTF-8") as device_file:
+                    device_file = device_file
                 scrap = sc.ScrapOffline()
-                raw_data = scrap.scrapData(page_array[pos], rcu_device_fa[device]['tag'])
+                raw_data = scrap.scrapData(device_file, rcu_device_fa[device]['tag'])
                 
 
                 for i in rcu_device_fa[device]['index_data']:
@@ -197,15 +202,16 @@ def startApp(row_num):
     def add_audio():
             print('Try add audio')
             n = 0
-            for device in rcu_device_addit:  #! <--- need parse throuth cycle 
+            for device in rcu_device_addit:
                 print(device)
                 data = []
                 cells = []
-            
+                with open (f"/files/{device}.html" , "r", encoding="UTF-8") as device_file:
+                    device_file = device_file
                 n = 0
                 pos = rcu_device_addit[device]['array_pos']
                 scraps = sc.ScrapOffline()
-                raw_data = scraps.scrapData(page_array[pos], rcu_device_addit[device]['tag'])
+                raw_data = scraps.scrapData(device_file, rcu_device_addit[device]['tag'])
 
                 for i in rcu_device_addit[device]['index_data']:
                     data.append(utility.roundFucn(raw_data[i]))

@@ -37,14 +37,14 @@ class ScrapDevice():
     
 
     #need to call this method with class tag (c_tag) and id tag (id_tag) passed
-    def scrapData(self, c_tag:str) -> list:
+    def scrapData(self,) -> list:
         """
         Scraping data from RCS device page
         """
 
         try:
             soup = BeautifulSoup(self.driver.page_source, 'lxml')
-            data = soup.find(class_=c_tag).find_all('td')
+            data = soup.find(class_=self.c_tag).find_all('td')
             params = utility.makeIndexList(data)
             print('    !INFO Gathered parametrs:\n', params)
             return params
@@ -57,7 +57,6 @@ class ScrapDevice():
         self.driver.quit()
 
     def saveToFile(self):
-        print("page",self.page)
         print("Saving device page to file ", self.name)
         with open(f"files/{self.name}.html", "w", encoding="UTF-8") as blank_file:
                     blank_file.write(self.driver.page_source)
