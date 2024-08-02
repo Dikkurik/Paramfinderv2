@@ -1,4 +1,3 @@
-#own modules
 import appfunc.utility as utility, time, main
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
@@ -18,6 +17,7 @@ class ScrapDevice():
         self.url = url
         self.cred = cred
         self.c_tag = c_tag
+        self.time = time.process_time()
 
     def connectToDevice(self, ) -> str:
         """
@@ -34,9 +34,6 @@ class ScrapDevice():
             print('    !ERROR\n',ex)
     
          
-    
-
-    #need to call this method with class tag (c_tag) and id tag (id_tag) passed
     def scrapData(self,) -> list:
         """
         Scraping data from RCS device page
@@ -55,6 +52,7 @@ class ScrapDevice():
         
     def quitDriver(self):
         self.driver.quit()
+        print("Time: ",self.time)
 
     def saveToFile(self):
         print("Saving device page to file ", self.name)
@@ -62,25 +60,12 @@ class ScrapDevice():
                     blank_file.write(self.driver.page_source)
 
 
-
-class ScrapFindAll(ScrapDevice): # <--- need to finish
-    """
+class ScrapOffline():
+        """
     Inherited class from ScrapDevice() where method
     scrapData() is redifined for scraping repeated
     tags on page
-    """
-    def scrapData(self, c_tag: str) -> list:
-        try:
-            soup = BeautifulSoup(self.page, 'lxml')
-            data = soup.find_all(class_=c_tag)
-            params = utility.makeIndexList(data)
-            print('    !INFO Gathered parametrs:\n', params)
-            return params
-        except Exception as ex:
-            print('    !ERROR\n', ex)
-
-
-class ScrapOffline():
+        """
         def scrapData(self, page:str, c_tag: str) -> list:
             try:
                 soup = BeautifulSoup(page, 'lxml')

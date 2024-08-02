@@ -54,7 +54,7 @@ class Database():
         Func that find empty cell in DB at 'A' column 
         and return cell that empty
         """
-        curr_sheet = self.workbook.active
+        curr_sheet = self.workbook["Текущий"]
         for i in range(730):
             if str(curr_sheet['B'+str(self.num)].value) == 'None':
                 if self.check_date() == True:

@@ -48,14 +48,8 @@ def roundFucn(number):
         print('Ошибка в округлении')
         return number
 
-def checkModulatorRRA(data):
-    if data == 'Вкл.':
+def checkModulatorRRA(data:str):
+    if 'Вкл.' in data:
         return ['AB']
     else:
         return ['BA']
-
-
-def makeParamArray(device_name, params): #! <--- need to finish this
-    pass
-        
-
