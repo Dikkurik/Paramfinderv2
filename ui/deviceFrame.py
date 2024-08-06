@@ -9,9 +9,9 @@ class Device():
         self.load_img()
 
     def load_img(self):
-        self.device_image = CTk.CTkImage(light_image=Image.open('image\device.png'), size=(30,30))
-        self.deviceOk_image = CTk.CTkImage(light_image=Image.open('image\deviceOk.png'), size=(30,30))
-        self.deviceFail_image = CTk.CTkImage(light_image=Image.open('image\deviceFail.png'), size=(30,30))
+        self.device_image = CTk.CTkImage(light_image=Image.open('image/device.png'), size=(30,30))
+        self.deviceOk_image = CTk.CTkImage(light_image=Image.open('image/deviceOk.png'), size=(30,30))
+        self.deviceFail_image = CTk.CTkImage(light_image=Image.open('image/deviceFail.png'), size=(30,30))
 
     def drawDevice(self, frame:object, name:str):
         """

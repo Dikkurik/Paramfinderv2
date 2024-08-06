@@ -1,5 +1,5 @@
 import customtkinter as CTk
-import tkinter, ui.deviceFrame, ui.settingsFrame, ui.deviceManagerUI, main
+import tkinter as tkinter, ui.deviceFrame, ui.settingsFrame, ui.deviceManagerUI, main
 from tkinter import *
 from PIL import Image
 
@@ -8,7 +8,7 @@ class Uinterface():
     def __init__(self):
         self.num = 0
         
-        self.database = main.database
+        self.database = main.db
 
         self.main_frame = CTk.CTk()
         self.main_frame.title('Paramfinder')
@@ -79,10 +79,10 @@ class Uinterface():
 
 
     def load_img(self):
-        self.cog_image = CTk.CTkImage(light_image=Image.open('image\iconcog.png'), size=(30,30))
-        self.dbOk_image = CTk.CTkImage(light_image=Image.open('image\databaseOk.png'), size=(30,30))
-        self.dbFail_image = CTk.CTkImage(light_image=Image.open('image\databaseFail.png'), size=(30,30))
-        self.imagedb = CTk.CTkImage(light_image=Image.open('image\database.png'), size=(30,30))
+        self.cog_image = CTk.CTkImage(light_image=Image.open('image/iconcog.png'), size=(30,30))
+        self.dbOk_image = CTk.CTkImage(light_image=Image.open('image/databaseOk.png'), size=(30,30))
+        self.dbFail_image = CTk.CTkImage(light_image=Image.open('image/databaseFail.png'), size=(30,30))
+        self.imagedb = CTk.CTkImage(light_image=Image.open('image/database.png'), size=(30,30))
         self.image_to_load = self.imagedb
 
     def find_cell(self):
@@ -106,7 +106,7 @@ class Uinterface():
             print('!ERROR ', ex)
 
     def dbConnect(self):
-        if main.database == True:
+        if main.dbconn == True:
             self.image_to_load = self.dbOk_image
         else:
             self.image_to_load = self.dbFail_image

@@ -10,7 +10,7 @@ class ScrapDevice():
 
     def __init__(self, name:str , url:str, cred:list, c_tag):
         s = Service('firefoxdrivers/geckodriver') 
-        o = Options(); # o.add_argument('--headless') 
+        o = Options(); #o.add_argument('--headless') 
         self.driver = webdriver.Firefox(service=s, options=o)
         print('    !INFO Run container... Loading web page...')
         self.name = name
